@@ -1,5 +1,6 @@
 package net.classified39.realitytest.blocks;
 
+import dan200.computercraft.api.lua.LuaException;
 import dan200.computercraft.api.lua.LuaFunction;
 import dan200.computercraft.api.lua.MethodResult;
 import dan200.computercraft.api.peripheral.IPeripheral;
@@ -85,8 +86,8 @@ public class ControllerBlockPeripheral implements IPeripheral {
     }
 
     @LuaFunction(mainThread = true)
-    public final void horizontalLine(int startX, int endX, int y, int color) throws LuaError {
-        if (startX == endX) {throw new LuaError("Line must be at least one pixel long!");}
+    public final void horizontalLine(int startX, int endX, int y, int color) throws LuaException {
+        if (startX == endX) {throw new LuaException("Line must be at least one pixel long!");}
         checkIfBufferIsNull();
         int minX = Integer.min(startX,endX);
         int maxX = Integer.max(startX,endX);
@@ -95,8 +96,8 @@ public class ControllerBlockPeripheral implements IPeripheral {
     }
 
     @LuaFunction(mainThread = true)
-    public final void verticalLine(int startY, int endY, int x, int color) throws LuaError {
-        if (startY == endY) {throw new LuaError("Line must be at least one pixel long!");}
+    public final void verticalLine(int startY, int endY, int x, int color) throws LuaException {
+        if (startY == endY) {throw new LuaException("Line must be at least one pixel long!");}
         checkIfBufferIsNull();
         int minY = Integer.min(startY,endY);
         int maxY = Integer.max(startY,endY);
@@ -135,11 +136,11 @@ public class ControllerBlockPeripheral implements IPeripheral {
     }
 
     @LuaFunction(mainThread = true)
-    public final void drawIntTable(int startX, int startY, LuaTable pixels) throws LuaError {
+    public final void drawIntTable(int startX, int startY, LuaTable pixels) throws LuaException {
         checkIfBufferIsNull();
         LuaValue[] pixelsAsArray = getAllTableValues(pixels);
         if (pixelsAsArray == null) {
-            throw new LuaError("Pixel table was empty!");
+            throw new LuaException("Pixel table was empty!");
         }
         for (int i = 0; i < pixelsAsArray.length; i++){
             if (pixelsAsArray[i].isTable()){
@@ -167,11 +168,16 @@ public class ControllerBlockPeripheral implements IPeripheral {
         return this.ID;
     }
 
-    private LuaValue[] getAllTableValues(LuaTable table) throws LuaError {
+    private LuaValue[] getAllTableValues(LuaTable table) throws LuaException {
         LuaValue key = Constants.NIL;
         List<LuaValue> luaList = new ArrayList<LuaValue>();
         do {
-            Varargs n = table.inext(key);
+            Varargs n = null;
+            try {
+                n = table.inext(key);
+            } catch (LuaError e) {
+                throw new LuaException("Could not read table!");
+            }
             key = n.arg(1);
             if (!key.isNil()) {
                 luaList.add(n.arg(2));

@@ -33,7 +33,6 @@ public class TestHudOverlay implements HudRenderCallback {
 
     public ARRenderer.ARTexture getOverlayTex(int id){
         if (arRenderer.getARTexture(id) == null){
-            RealityMod.LOGGER.info("NULL TEXTURE");
             arRenderer = new ARRenderer(MinecraftClient.getInstance().getTextureManager());
         }
         return arRenderer.getARTexture(id);
@@ -42,7 +41,6 @@ public class TestHudOverlay implements HudRenderCallback {
     public void renderAROverlay(MatrixStack matrixStack, int id){
         ARRenderer.ARTexture texture = getOverlayTex(id);
         if (texture != null) {
-            //RealityMod.LOGGER.info("RENDER");
             ARState state = texture.getState();
             int x = state.screenWidth;
             int y = state.screenHeight;
@@ -54,7 +52,6 @@ public class TestHudOverlay implements HudRenderCallback {
 
     public void updateAROverlay(int id,ARState state){
         ARRenderer.ARTexture texture = getOverlayTex(id);
-        RealityMod.LOGGER.info("UPDATE");
         texture.setState(state);
     }
 }

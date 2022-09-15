@@ -83,10 +83,8 @@ public class ARRenderer implements AutoCloseable {
         }
 
         public void setState(ARState state) {
-            RealityMod.LOGGER.info("SETTING STATE");
             boolean bl = this.state.colors != state.colors;
             this.state = state;
-            RealityMod.LOGGER.info("EQUALS "+bl);
             this.needsUpdate = bl;
         }
 

@@ -16,7 +16,6 @@ public class ARState extends PersistentState {
     public int[][] colors;
 
     public ARState(int width, int height){
-        RealityMod.LOGGER.info("NEW AR STATE");
         this.screenWidth = width;
         this.screenHeight = height;
         this.colors = new int[width][height];
@@ -24,7 +23,6 @@ public class ARState extends PersistentState {
     }
 
     public ARState(ARState oldState){
-        RealityMod.LOGGER.info("NEW AR STATE FROM OLD STATE");
         this.screenHeight = oldState.screenHeight;
         this.screenWidth = oldState.screenWidth;
         this.colors = new int[oldState.screenWidth][oldState.screenHeight];

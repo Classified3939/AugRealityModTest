@@ -12,6 +12,7 @@ import net.classified39.realitytest.util.ARAction;
 import net.classified39.realitytest.util.ARState;
 import net.minecraft.client.texture.NativeImage;
 import net.minecraft.nbt.NbtCompound;
+import org.apache.commons.lang3.ArrayUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.squiddev.cobalt.*;
@@ -20,6 +21,7 @@ import javax.annotation.Nonnull;
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class ControllerBlockPeripheral implements IPeripheral {
     private final ControllerBlockEntity controller_block_entity;
@@ -136,21 +138,20 @@ public class ControllerBlockPeripheral implements IPeripheral {
     }
 
     @LuaFunction(mainThread = true)
-    public final void drawIntTable(int startX, int startY, LuaTable pixels) throws LuaException {
+    public final void drawIntTable(int startX, int startY, int width, int height, Map<?, ?> pixels) throws LuaException {
         checkIfBufferIsNull();
-        LuaValue[] pixelsAsArray = getAllTableValues(pixels);
-        if (pixelsAsArray == null) {
+        if (pixels.isEmpty()) {
             throw new LuaException("Pixel table was empty!");
         }
-        for (int i = 0; i < pixelsAsArray.length; i++){
-            if (pixelsAsArray[i].isTable()){
-                LuaValue[] pixelRowArray = getAllTableValues((LuaTable)pixelsAsArray[i]);
-                if (pixelRowArray != null){
-                    for (int j = 0; j < pixelRowArray.length; j++){
-                        int[] args = new int[]{j+startX,i+startY,pixelRowArray[j].toInteger()};
-                        this.bufferState = new ARAction().renderAction(this.ID,this.bufferState, ARAction.RenderType.DRAWPIXEL,args);
-                    }
-                }
+        for (double i = 1; i < height; i++){
+            Map<?,?> pixelRowTable = (Map<?, ?>) pixels.get(i);
+            if (pixelRowTable.isEmpty()){
+                continue;
+            }
+            for (double j = 1; j < width; j++){
+                double value = (double) pixelRowTable.get(j);
+                int[] args = new int[]{((int) j+startX), ((int) i +startY),getColorFromInt((int) value)};
+                    this.bufferState = new ARAction().renderAction(this.ID,this.bufferState, ARAction.RenderType.DRAWPIXEL,args);
             }
         }
     }
@@ -168,24 +169,6 @@ public class ControllerBlockPeripheral implements IPeripheral {
         return this.ID;
     }
 
-    private LuaValue[] getAllTableValues(LuaTable table) throws LuaException {
-        LuaValue key = Constants.NIL;
-        List<LuaValue> luaList = new ArrayList<LuaValue>();
-        do {
-            Varargs n = null;
-            try {
-                n = table.inext(key);
-            } catch (LuaError e) {
-                throw new LuaException("Could not read table!");
-            }
-            key = n.arg(1);
-            if (!key.isNil()) {
-                luaList.add(n.arg(2));
-            }
-        }while (!key.isNil()) ;
-        if (luaList.isEmpty()){return null;}
-        else{return luaList.toArray(new LuaValue[0]);}
-    }
 
     @LuaFunction(mainThread=true)
     public final int getColorFromName(String name){
@@ -291,6 +274,61 @@ public class ControllerBlockPeripheral implements IPeripheral {
                 return getColorFromHex("#CC4C4C");
             }
             case "f" -> {
+                return getColorFromHex("#111111");
+            }
+        }
+        return 0;
+    }
+
+    @LuaFunction(mainThread=true)
+    public final int getColorFromInt(int ch){
+        switch (ch) {
+            case 1 -> {
+                return getColorFromHex("#F0F0F0");
+            }
+            case 2 -> {
+                return getColorFromHex("#F2B233");
+            }
+            case 4 -> {
+                return getColorFromHex("#E57FD8");
+            }
+            case 8 -> {
+                return getColorFromHex("#99B2F2");
+            }
+            case 16 -> {
+                return getColorFromHex("#DEDE6C");
+            }
+            case 32 -> {
+                return getColorFromHex("#7FCC19");
+            }
+            case 64 -> {
+                return getColorFromHex("#F2B2CC");
+            }
+            case 128 -> {
+                return getColorFromHex("#4C4C4C");
+            }
+            case 256 -> {
+                return getColorFromHex("#999999");
+            }
+            case 512 -> {
+                return getColorFromHex("#4C99B2");
+            }
+            case 1024 -> {
+                return getColorFromHex("#B266E5");
+            }
+            case 2048 -> {
+                return getColorFromHex("#3366CC");
+            }
+            case 4096 -> {
+                return getColorFromHex("#7F664C");
+            }
+            case 8192 -> {
+                return getColorFromHex("#57A64E");
+            }
+            case 16384 -> {
+                return getColorFromHex("#CC4C4C");
+            }
+            case 32768 -> {
                 return getColorFromHex("#111111");
             }
         }

@@ -62,7 +62,7 @@ public class ARState extends PersistentState {
             }
         }
         Integer[] tempArray = tempList.toArray(new Integer[0]);
-        //int[] is not int[], so toPrimitive is NEEDED
+        //integer[] is not int[], so toPrimitive is NEEDED
         return ArrayUtils.toPrimitive(tempArray);
     }
 
